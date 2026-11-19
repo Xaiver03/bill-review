@@ -11,6 +11,7 @@
 | 了解系统设计与信息架构 | [架构总览](01-architecture/README.md) |
 | 信息架构与命名/分层规范 | [信息架构规范](01-architecture/information-architecture.md) |
 | 分类算法怎么工作 | [分类设计](01-architecture/classification.md) |
+| AI 预分类（本地模型） | [AI 预分类](01-architecture/ai-classification.md) |
 | 分类→复核→导出怎么走 | [复核闭环](02-workflow/review-loop.md) |
 | 输入输出字段 | [字段规范](03-reference/schema.md) |
 | 导出到 木木/Firefly/beancount | [导出目标映射](03-reference/export-targets.md) |

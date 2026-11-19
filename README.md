@@ -41,3 +41,12 @@ Python 3.9+；导出 xlsx 需要 `openpyxl`（`pip install openpyxl`）。
 
 ## License
 MIT
+
+## 预览
+看板 `web/dashboard.html`：
+
+![看板](docs/preview-dashboard.png)
+
+复核 `web/review.html`（按对手方批量打分类）：
+
+![复核](docs/preview-review.png)

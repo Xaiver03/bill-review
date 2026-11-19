@@ -12,9 +12,11 @@ bill-review/
 ├── sample/           合成示例数据（仅此入库，供开箱演示）
 ├── tests/            测试
 ├── scripts/          校验与编排脚本
-├── docs/             文档（编号分区，见 docs/README.md）
+├── docs/             文档（编号分区，见 docs/README.md；06-memory 为项目记忆）
 ├── data/             真实账单（.gitignore，绝不入库）
 ├── build/            生成产物（.gitignore）
+├── .local/           私有易变记忆（.gitignore，不入库）
+├── AGENTS.md         项目记忆总入口（索引 + 工作原则）
 ├── requirements.txt
 ├── LICENSE
 └── README.md
@@ -26,6 +28,7 @@ bill-review/
 | 分类/导出逻辑 | `src/billkit.py` | CLI、web 复核 |
 | 复核/看板界面 | `web/` | 本地浏览器打开 |
 | 字段与导出契约 | `docs/03-reference/` | 开发与贡献者 |
+| 项目记忆 | `AGENTS.md` + `docs/06-memory/` | 所有 AI 会话与维护者 |
 | 真实账单 | `data/`（本地） | 不上传、不入库 |
 
 禁止把真实账单、生成产物提交进仓库；禁止在 `sample/` 放真实数据。

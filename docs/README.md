@@ -17,6 +17,7 @@
 | 导出到 木木/Firefly/beancount | [导出目标映射](03-reference/export-targets.md) |
 | 安装 / 运行 / 参与贡献 | [操作指南](04-guides/install.md) |
 | 项目实现记录 | [项目记录](05-project/README.md) |
+| 项目记忆（工作原则/产品原则/决策） | [记忆体系](06-memory/README.md) |
 | 下一步计划 | [路线图](plans/roadmap.md) |
 
 ## 信息结构
@@ -27,6 +28,7 @@ docs/
 ├── 03-reference/      参考资料（字段、导出目标映射）
 ├── 04-guides/         操作指南（安装/运行/贡献）
 ├── 05-project/        有日期的项目实现与验收记录
+├── 06-memory/         项目记忆（工作原则/产品原则/决策）
 └── plans/             尚未完成的实施计划
 ```
 

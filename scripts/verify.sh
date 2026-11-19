@@ -3,6 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 echo "== 文档结构 =="; python3 scripts/verify_docs.py
+echo "== 记忆体系 =="; python3 scripts/verify_memory.py
 echo "== 单元测试 =="; python3 tests/test_billkit.py
 echo "== sample 全流程 =="; OUT=$(mktemp -d); python3 src/billkit.py all --input sample/ledger.sample.csv --out "$OUT" >/dev/null
 echo "== beancount 校验 =="

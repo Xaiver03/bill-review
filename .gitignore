@@ -9,6 +9,8 @@ build/
 out/
 output/
 dist/
+# 私有易变记忆不入库（公共记忆见 docs/06-memory/）
+.local/
 # 真实账单不入库
 **/real/
 *.real.csv

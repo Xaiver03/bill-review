@@ -23,3 +23,6 @@
 | account | 归一化账户名 |
 
 TAXONOMY：餐饮 交通出行 购物日用 居住 生活服务 娱乐休闲 医疗健康 教育学习 旅游住宿 人情往来 金融保险 投资理财 转账还款 收入 退款/冲正 其他
+
+## 输出（classified.csv 追加）
+purpose_l1 / purpose_l2 / confidence / classify_by / needs_review / account（详见 architecture/classification.md）。

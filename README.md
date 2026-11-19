@@ -1,52 +1,48 @@
 # billkit · 中文个人账单治理
 
-把微信 / 支付宝 / 招商银行 / 工商银行 等导出的**脏账单**，清洗成**分好类、可复核、可多目标导入**的干净账本。
+把微信 / 支付宝 / 招商银行 / 工商银行 等导出的**脏账单**，清洗成**分好类、可复核、可多目标导入**的干净账本。离线、纯本地、可开源。
 
-## 解决什么
-- 多源账单格式不统一、跨渠道重复
-- 记账 App 没有批量导入 / 几千条没法逐条点分类
-- 微信/支付宝账单导入难
+## 能力
+- 多源账单标准化（微信/支付宝/招行/工行）
+- 跨渠道去重
+- 四级用途分类（交易类型映射 + 商户规则 + 同商户先验 + 待人工）
+- 本地复核界面（按对手方批量打分类）+ 可视化看板
+- 一键导出：木木记账模板 / Firefly III CSV / beancount 文本账本
 
-## 流程
+## 目录（canonical layout）
+```text
+bill-review/
+├── src/        核心 CLI（billkit）
+├── web/        本地前端（review / dashboard，纯前端零依赖）
+├── sample/     合成示例（仅此入库）
+├── tests/      测试
+├── scripts/    校验与编排
+├── docs/       文档中心（编号分区）
+├── data/       真实账单（.gitignore，绝不入库）
+├── build/      生成产物（.gitignore）
+└── README.md
 ```
-原始账单.csv → 标准化 → (去重) → 用途分类(规则+先验) → 人工复核 → 导出
-                                                        ├ 木木记账模板 xlsx
-                                                        ├ Firefly III csv
-                                                        ├ beancount 文本账本
-                                                        └ 通用 csv
-```
+目录与所有权见 [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)；全部文档入口见 [docs/README.md](docs/README.md)。
 
-## 用法
+## 快速开始
 ```bash
-python3 pipeline/billkit.py all --input 你的账本.csv --out build/
-# 产出 build/：classified.csv / review_queue.csv / mumu_import.xlsx / beancount.bean / firefly.csv / stats.json
+pip install -r requirements.txt
+python3 src/billkit.py all --input sample/ledger.sample.csv --out build/
+# 复核：浏览器打开 web/review.html，选 build/classified.csv
+# 看板：浏览器打开 web/dashboard.html，选 build/classified.csv
 ```
-只重导出（例如复核改完 classified.csv 后）：
-```bash
-python3 pipeline/billkit.py export --classified build/classified.csv --out build/
-```
-
-## 复核界面 & 看板（本地、纯前端、不上传）
-- `web/review.html` —— 打开后选择 `classified.csv`，按商户批量打分类、导出 `classified_corrected.csv`
-- `web/dashboard.html` —— 打开后选择 `classified.csv`，看收支结构/分类占比/月度趋势
-
-## 输入字段
-见 `docs/SCHEMA.md`：`datetime, amount, type, counterparty, category, note, source, payment_method`（缺列按空处理）。
-
-## 隐私
-所有处理**在本机进行**，不联网、不上传。真实账单不要提交到仓库：`.gitignore` 已排除 `data/`、`build/`、`*.real.csv`。仓库只带 `sample/` 下的**合成示例**。
-
-## 依赖
-Python 3.9+；导出 xlsx 需要 `openpyxl`（`pip install openpyxl`）。
-
-## License
-MIT
 
 ## 预览
-看板 `web/dashboard.html`：
+看板：
 
 ![看板](docs/preview-dashboard.png)
 
-复核 `web/review.html`（按对手方批量打分类）：
+复核（按对手方批量打分类）：
 
 ![复核](docs/preview-review.png)
+
+## 隐私
+所有处理在本机进行，不联网、不上传。真实账单绝不入库：`.gitignore` 排除 `data/`、`build/`、`*.real.csv`，仓库只带 `sample/` 的合成示例。
+
+## License
+MIT

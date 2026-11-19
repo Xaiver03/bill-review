@@ -1,11 +1,14 @@
 __pycache__/
 *.pyc
+*.egg-info/
+.venv/
 .DS_Store
 *.log
 data/
 build/
 out/
 output/
+dist/
 # 真实账单不入库
 **/real/
 *.real.csv

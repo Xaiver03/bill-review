@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>账单看板</title>
+<style>
+  :root{--bg:#0f1115;--panel:#171a21;--line:#262b36;--fg:#e6e9ef;--dim:#8b93a7;--accent:#4f8cff;--ok:#37c98b;--warn:#f5a524;--c1:#4f8cff;--c2:#37c98b;--c3:#f5a524;--c4:#b06ef5;}
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif;background:var(--bg);color:var(--fg);padding:18px}
+  h1{font-size:16px;margin:0 0 14px}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .card .k{color:var(--dim);font-size:12px}
+  .card .v{font-size:22px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:280px}
+  .box h2{font-size:13px;color:var(--dim);margin:0 0 12px;font-weight:500}
+  svg{width:100%;height:auto;display:block}
+  .mini{color:var(--dim);font-size:12px}
+  .bar-row{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:12px}
+  .bar-row .lab{width:78px;color:var(--dim);text-align:right;white-space:nowrap;overflow:hidden}
+  .bar-row .tr{flex:1;background:#22283a;border-radius:5px;height:16px;position:relative}
+  .bar-row .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--c1)}
+  .bar-row .val{width:96px;text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<h1>账单看板</h1>
+<label class="mini">账单文件 <input type="file" id="file" accept=".csv"></label>
+<div id="app"></div>
+<script>
+const fmt=n=>'¥'+(n||0).toLocaleString('zh-CN',{maximumFractionDigits:0});
+function parseCSV(text){const rows=[];let f='',row=[],q=false;text=text.replace(/^\uFEFF/,'');
+ for(let i=0;i<text.length;i++){const c=text[i];if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}else{if(c==='"')q=true;else if(c===','){row.push(f);f='';}else if(c==='\n'){row.push(f);rows.push(row);row=[];f='';}else if(c==='\r'){}else f+=c;}}
+ if(f!==''||row.length){row.push(f);rows.push(row);}return rows;}
+function load(text){const rows=parseCSV(text);if(!rows.length)return;const H=rows[0];const D=rows.slice(1).map(r=>{const o={};H.forEach((k,i)=>o[k]=r[i]??'');return o;});
+ const isExp=r=>(r.type||'')==='expense';const isInc=r=>(r.type||'')==='income';
+ const exp=D.filter(isExp), inc=D.filter(isInc);
+ const expSum=exp.reduce((s,r)=>s+(+r.amount||0),0), incSum=inc.reduce((s,r)=>s+(+r.amount||0),0);
+ const review=D.filter(r=>r.needs_review==='1').length;
+ // by source
+ const bySrc={}; exp.forEach(r=>{bySrc[r.source]=(bySrc[r.source]||0)+(+r.amount||0);});
+ // by purpose
+ const byPur={}; exp.forEach(r=>{byPur[r.purpose_l1||'其他']=(byPur[r.purpose_l1||'其他']||0)+(+r.amount||0);});
+ const purArr=Object.entries(byPur).sort((a,b)=>b[1]-a[1]).slice(0,14);
+ // monthly expense
+ const byMon={}; exp.forEach(r=>{const m=(r.datetime||'').slice(0,7);if(m)byMon[m]=(byMon[m]||0)+(+r.amount||0);});
+ const monArr=Object.entries(byMon).sort((a,b)=>a[0]<b[0]?-1:1);
+ document.getElementById('app').innerHTML=`
+ <div class="cards">
+   <div class="card"><div class="k">总记录</div><div class="v">${D.length.toLocaleString()}</div></div>
+   <div class="card"><div class="k">支出合计</div><div class="v">${fmt(expSum)}</div></div>
+   <div class="card"><div class="k">收入合计</div><div class="v">${fmt(incSum)}</div></div>
+   <div class="card"><div class="k">待复核</div><div class="v" style="color:var(--warn)">${review} <span class="mini">(${(review/D.length*100).toFixed(0)}%)</span></div></div>
+ </div>
+ <div class="grid">
+   <div class="box"><h2>支出 · 按来源</h2>${bars(Object.entries(bySrc).sort((a,b)=>b[1]-a[1]),expSum)}</div>
+   <div class="box"><h2>支出 · 按用途</h2>${bars(purArr,expSum)}</div>
+   <div class="box" style="grid-column:1/3"><h2>支出 · 月度趋势</h2>${line(monArr)}</div>
+ </div>`;
+}
+function bars(arr,total){const mx=Math.max(1,...arr.map(a=>a[1]));return arr.map(([k,v])=>`<div class="bar-row"><div class="lab" title="${k}">${k}</div><div class="tr"><i style="width:${(v/mx*100).toFixed(1)}%"></i></div><div class="val">${fmt(v)} <span class="mini">${(v/total*100).toFixed(0)}%</span></div></div>`).join('');}
+function line(arr){if(!arr.length)return '<div class="mini">无数据</div>';const W=900,H=220,pl=50,pb=28,pt=10,pr=12;const mx=Math.max(1,...arr.map(a=>a[1]));
+ const sx=i=>pl+(W-pl-pr)*(arr.length>1?i/(arr.length-1):0);const sy=v=>pt+(H-pt-pb)*(1-v/mx);
+ let d='',dots='',xl='';arr.forEach(([m,v],i)=>{const x=sx(i),y=sy(v);d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';dots+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="${'var(--c1)'}"/>`;if(arr.length<=14||i%Math.ceil(arr.length/14)===0)xl+=`<text x="${x.toFixed(1)}" y="${H-8}" font-size="10" fill="#8b93a7" text-anchor="middle">${m.slice(2)}</text>`;});
+ return `<svg viewBox="0 0 ${W} ${H}"><line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="#262b36"/><path d="${d}" fill="none" stroke="#4f8cff" stroke-width="2"/>${dots}${xl}<text x="6" y="14" font-size="10" fill="#8b93a7">${fmt(mx)}</text></svg>`;}
+document.getElementById('file').addEventListener('change',ev=>{const f=ev.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>load(rd.result);rd.readAsText(f,'utf-8');});
+</script>
+</body>
+</html>

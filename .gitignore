@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+data/
+build/
+out/
+output/
+# 真实账单不入库
+**/real/
+*.real.csv
+sample/*.real.*
